@@ -9,12 +9,15 @@ public class Programa {
 
 	public static ArrayList<String> pila;
 	public static ArrayList<String> prefija;
+	public static ArrayList<String> numeros;
 	public static char[] expresion;
 
 	public static void main(String[] args) {
 		pila = new ArrayList<String>();
 		prefija = new ArrayList<String>();
-		String prueba = "2*(3+5)";
+		//String prueba = "5-(6*7)";
+		//String prueba ="5-6*7";
+		String prueba = "3+4*(3+7)";
 		expresion = invierteCadena(prueba).toCharArray();
 		int cont = 0;
 		if (prueba.contains("(") && prueba.contains(")")) {
@@ -55,7 +58,97 @@ public class Programa {
 				prefija.add(pila.get(i));
 			}
 		}
-		System.out.println(invertirArreglo(prefija));
+		//System.out.println(invertirArreglo(prefija));
+		// Resolver la ecuacion resultante
+		ArrayList<String> resultado = invertirArreglo(prefija);
+		System.out.println(resultado);
+		
+		if(!prueba.contains("(")) {
+			buscaResultadoSinparentesis(resultado);
+		}else {
+			buscaResultado(resultado);
+		}
+	}
+
+	private static void buscaResultadoSinparentesis(ArrayList<String> resultado) {
+		pila.clear();
+		numeros= new ArrayList<String>();
+		
+		for(int i =0;i<resultado.size();i++){
+			if (Character.isDigit(resultado.get(i).charAt(0))) {
+				numeros.add(resultado.get(i));
+			}else {
+				pila.add(resultado.get(i));
+			}
+		}
+		//realizar operaciones
+		int dig1,dig2,aux;
+		//System.out.println(numeros);
+		dig1=Integer.valueOf(numeros.get(0));
+		numeros.remove(0);
+		dig2=Integer.valueOf(numeros.get(0));
+		numeros.remove(0);
+		//System.out.println(numeros);
+		for (int i =pila.size()-1 ; i >=0 ; i--) {
+			aux=operar(dig1,dig2,pila.get(i));
+			dig1=aux;
+			if (numeros.size()!=0) {
+				dig2=Integer.valueOf(numeros.get(0));
+				numeros.remove(0);
+			}
+		}
+		System.out.println("El resultado es : "+ dig1);
+		
+	}
+
+	private static void buscaResultado(ArrayList<String> resultado) {
+		
+		pila.clear();
+		numeros= new ArrayList<String>();
+		
+		for(int i = resultado.size()-1;i>=0;i--){
+			if (Character.isDigit(resultado.get(i).charAt(0))) {
+				numeros.add(resultado.get(i));
+			}else {
+				pila.add(resultado.get(i));
+			}
+		}
+		//realizar operaciones
+		int dig1,dig2,aux;
+		//System.out.println(numeros);
+		dig1=Integer.valueOf(numeros.get(0));
+		numeros.remove(0);
+		dig2=Integer.valueOf(numeros.get(0));
+		numeros.remove(0);
+		//System.out.println(numeros);
+		for (int i =0; i <pila.size(); i++) {
+			aux=operar(dig1,dig2,pila.get(i));
+			dig2=aux;
+			if (numeros.size()!=0) {
+				dig1=Integer.valueOf(numeros.get(0));
+				numeros.remove(0);
+			}
+		}
+		System.out.println("El resultado es : "+ dig2);
+	}
+
+	private static int operar(int dig1, int dig2, String operador) {
+		
+		switch (operador) {
+		case "+":
+			return dig1+dig2;
+		case "-":
+			return dig1-dig2;
+		case "*":
+			return dig1*dig2;
+		case "/":
+			return dig1/dig2;
+
+		default:
+			break;
+		}
+		return 0;
+		
 	}
 
 	private static boolean sinParentesis(ArrayList<String> pila2) {
